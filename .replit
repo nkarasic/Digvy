@@ -1,0 +1,13 @@
+run = "npm install && npm install --prefix client && npm run build && npm start"
+entrypoint = "server/index.js"
+
+[nix]
+channel = "stable-24_05"
+
+[env]
+NODE_ENV = "production"
+PORT = "3000"
+
+[[ports]]
+localPort = 3000
+externalPort = 80
