@@ -1,0 +1,23 @@
+{
+  "name": "digvy",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "node --watch server/index.js",
+    "dev:client": "npm run dev --prefix client",
+    "build": "npm run build --prefix client",
+    "start": "NODE_ENV=production node server/index.js"
+  },
+  "dependencies": {
+    "concurrently": "^9.1.2",
+    "csv-parse": "^5.6.0",
+    "date-fns": "^4.1.0",
+    "express": "^4.21.2",
+    "fuse.js": "^7.1.0",
+    "lowdb": "^7.0.1",
+    "multer": "^1.4.5-lts.1",
+    "nanoid": "^5.1.5"
+  }
+}

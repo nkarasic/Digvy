@@ -1,0 +1,102 @@
+Build a local web application called "Digvy" to manage infrequent life events — recurring tasks, subscriptions, appointments, and one-time reference records.
+
+### 1. Project Structure
+- Backend: Node.js/Express server using `lowdb` or standard `fs` to manage a `db.json` file.
+- Frontend: React (Vite) with Tailwind CSS.
+- Mobile-first UI: Bottom navigation with four tabs — Dashboard, Search, Stats, Settings.
+
+### 2. Data Model (JSON)
+Each item should include:
+- `id` (auto-generated)
+- `name` (string)
+- `category` (string — e.g., Auto, Subscription, Health, Home, Insurance, Travel, Finance, Personal Care, Membership, Domain, Misc)
+- `status`: one of:
+  - **Active** — has a meaningful next date or is a recurring item being tracked.
+  - **Inactive** — deliberately paused or cancelled, but could resume (e.g., cancelled subscriptions).
+  - **Historical** — one-time past event kept purely for reference (e.g., accidents, major purchases, installations).
+- `logic_type`: one of:
+  - **Interval** — recurring on a fixed cadence (e.g., every 12 months). Stores `interval_months`.
+  - **Fixed** — has a specific next date that doesn't follow a pattern (e.g., passport expiration, a one-off appointment).
+  - **Reference** — no next date and never will. Exists solely as a searchable historical record.
+- `interval_months` (number, only for Interval type)
+- `next_date` (date or null; supports a special value of `"never"` for items that never expire)
+- `cancel_by_date` (date or null — the date by which you must cancel to avoid a charge or renewal)
+- `details` (string — quick-reference info: part numbers, model numbers, sizes, battery types, specs, etc.)
+- `link_url` (string or null — a relevant URL)
+- `logs` array, each entry containing:
+  - `date` (date)
+  - `time` (string or null — e.g., "8:40 AM", "Noon - 2pm")
+  - `price_paid` (number or null)
+  - `note` (string)
+
+### 3. Core Features
+
+**Smart Dashboard**
+- Show only Active items, split into two sections:
+  1. **Action Required** — items with a `next_date` or `cancel_by_date`, sorted by urgency.
+  2. **No Upcoming Date** — active items with no next date (e.g., haircuts, key fob battery) shown below, sorted by "days since last" descending.
+- Items with `next_date` set to `"never"` should not appear on the dashboard.
+
+**Urgency Sorting & Color Coding**
+- Uses the *earlier* of `next_date` and `cancel_by_date` to determine urgency:
+  - **Overdue** (date < today) → Red
+  - **Due Soon** (within 30 days) → Yellow
+  - **On Track** (> 30 days) → Green
+- If `cancel_by_date` is the triggering date, show a "Cancel by" label instead of "Due".
+
+**Item Detail & History**
+- Clicking an item shows:
+  - Current status, category, next date, cancel-by date, and the `details` field displayed prominently.
+  - A vertical timeline of every past log entry with date, time, price paid, and note.
+  - The most recent note should be visually highlighted at the top of the timeline.
+
+**Global Search**
+- Fuzzy search across name, notes, details, and category for ALL items regardless of status.
+- Results should indicate status (Active / Inactive / Historical) with a subtle badge.
+
+**Logging Action (marking an item as "done")**
+- When logging a new event:
+  - If **Interval**: auto-set `next_date` = today + `interval_months`. Pre-fill but allow override.
+  - If **Fixed**: prompt for the next date. Offer a "Cancel / Inactivate" button if there's no future occurrence.
+  - If **Reference**: no next date logic; just append the log entry.
+- Always prompt for: date (default today), time (optional), price paid (optional), note (optional).
+
+**Snooze / Acknowledge for Overdue Items**
+- Overdue items should have an "Acknowledge" action that clears the overdue state without logging a fake event. This sets a `snoozed_until` date or simply moves the next date forward.
+- This prevents the dashboard from being a wall of red after initial import.
+
+### 4. Special Tools
+
+**CSV Importer**
+- A UI to upload a CSV matching this column structure:
+  `[Name, Category, Last time, Days since last, Next time, Days until next, Notes]`
+  - The first column (Name) may be unlabeled in the CSV header.
+  - `Days since last` and `Days until next` are calculated fields — ignore them during import.
+  - Import logic:
+    - If Notes contain "cancel" or "cancelled" (case-insensitive), set status to **Inactive**.
+    - If `Next time` is empty, past, or the value `"never expire"` / `"never"`, handle accordingly:
+      - `"never"` / `"never expire"` → set `next_date` to `"never"`, status to Active.
+      - Empty and `Last time` is also empty → set status to Historical.
+      - Empty and `Last time` exists → set status to Active with no next date.
+      - Past date → set status to Active (it's overdue).
+    - Populate the first log entry from `Last time`.
+    - Parse price information from Notes (look for `$` followed by a number) and store as `price_paid` on the initial log entry.
+    - Parse time information from Notes (look for patterns like "8:40 AM", "Noon", "10:15 AM") and store as `time` on the initial log entry.
+  - After import, show a review/triage screen where the user can verify status assignments and correct any misclassified items before saving.
+
+**Analytics (Stats Tab)**
+- Total spend by category (from all log entries with `price_paid`).
+- Average interval between log entries for recurring items.
+- Upcoming costs: list of items due in the next 90 days that have a known price.
+- Subscription summary: count of active vs. cancelled subscriptions, total annual subscription cost.
+
+### 5. Item Creation & Editing
+- When creating a new item, offer category suggestions based on existing categories in the database.
+- For Interval items, offer common default intervals: 3, 6, 12, 24, 60 months.
+- Allow editing all fields on an existing item, including changing status and logic type.
+
+### 6. Deployment Instructions
+- Include a README with instructions to:
+  - Install and run locally on a Mac.
+  - Access from an iPhone browser using the Mac's local IP address.
+  - Persist data via the `db.json` file (mention backup strategy).
