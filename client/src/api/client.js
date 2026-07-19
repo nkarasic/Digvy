@@ -69,6 +69,11 @@ export const api = {
   },
   importConfirm: (items) => request('/import/confirm', { method: 'POST', body: JSON.stringify({ items }) }),
 
+  // Email preferences
+  getEmailPreferences: () => request('/email/preferences'),
+  updateEmailPreferences: (digest_enabled) =>
+    request('/email/preferences', { method: 'PUT', body: JSON.stringify({ digest_enabled }) }),
+
   // Stats
   getSpendByCategory: () => request('/stats/spend-by-category'),
   getUpcomingCosts: (days) => request(`/stats/upcoming-costs${days ? `?days=${days}` : ''}`),
