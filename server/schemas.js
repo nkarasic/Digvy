@@ -43,6 +43,10 @@ export const snoozeSchema = z.object({
   snoozed_until: isoDate,
 });
 
+export const emailPreferencesSchema = z.object({
+  digest_enabled: z.boolean(),
+});
+
 export const importConfirmSchema = z.object({
   items: z.array(itemCreateSchema.extend({
     logs: z.array(logCreateSchema).max(100).optional(),

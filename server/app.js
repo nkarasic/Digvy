@@ -11,6 +11,8 @@ import categoryRoutes from './routes/categories.js';
 import searchRoutes from './routes/search.js';
 import importRoutes from './routes/import.js';
 import statsRoutes from './routes/stats.js';
+import digestRoutes from './routes/digest.js';
+import emailRoutes from './routes/email.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -39,6 +41,11 @@ app.use('/api/categories', requireAuth, categoryRoutes);
 app.use('/api/search', requireAuth, searchRoutes);
 app.use('/api/import', requireAuth, importRoutes);
 app.use('/api/stats', requireAuth, statsRoutes);
+
+// These manage their own auth: CRON_SECRET for the digest trigger,
+// unsubscribe token or per-route JWT for email preferences
+app.use('/api/digest', digestRoutes);
+app.use('/api/email', emailRoutes);
 
 app.use('/api', (req, res) => {
   res.status(404).json({ error: 'Not found' });

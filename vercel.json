@@ -2,5 +2,8 @@
   "outputDirectory": "client/dist",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" }
+  ],
+  "crons": [
+    { "path": "/api/digest/run", "schedule": "0 13 * * *" }
   ]
 }
