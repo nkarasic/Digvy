@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { addDays, format } from 'date-fns';
-import { buildDigest, renderDigestEmail } from '../services/digestService.js';
+import { buildDigest, renderDigestEmail } from '../services/digestBuilder.js';
 
 const iso = (offsetDays) => format(addDays(new Date(), offsetDays), 'yyyy-MM-dd');
 
