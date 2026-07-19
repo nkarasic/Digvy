@@ -1,6 +1,10 @@
+import 'dotenv/config';
 import express from 'express';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { requireAuth } from './middleware/auth.js';
 import itemRoutes from './routes/items.js';
 import logRoutes from './routes/logs.js';
 import categoryRoutes from './routes/categories.js';
@@ -12,15 +16,26 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(express.json());
+// CSP disabled: the SPA is served from the same origin and Vite manages assets
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(express.json({ limit: '1mb' }));
 
-// API routes
-app.use('/api/items', itemRoutes);
-app.use('/api/items', logRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/search', searchRoutes);
-app.use('/api/import', importRoutes);
-app.use('/api/stats', statsRoutes);
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api', apiLimiter);
+
+// All API routes require a valid Supabase JWT (auth itself is handled
+// client-side by supabase-js: signup, login, refresh, password reset)
+app.use('/api/items', requireAuth, itemRoutes);
+app.use('/api/items', requireAuth, logRoutes);
+app.use('/api/categories', requireAuth, categoryRoutes);
+app.use('/api/search', requireAuth, searchRoutes);
+app.use('/api/import', requireAuth, importRoutes);
+app.use('/api/stats', requireAuth, statsRoutes);
 
 // Production static serving
 if (process.env.NODE_ENV === 'production') {

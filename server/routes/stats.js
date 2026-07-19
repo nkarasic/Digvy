@@ -5,7 +5,7 @@ const router = Router();
 
 router.get('/spend-by-category', async (req, res) => {
   try {
-    const data = await statsService.getSpendByCategory();
+    const data = await statsService.getSpendByCategory(req.userId);
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -15,7 +15,7 @@ router.get('/spend-by-category', async (req, res) => {
 router.get('/upcoming-costs', async (req, res) => {
   try {
     const days = req.query.days ? parseInt(req.query.days) : 90;
-    const data = await statsService.getUpcomingCosts(days);
+    const data = await statsService.getUpcomingCosts(req.userId, days);
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -24,7 +24,7 @@ router.get('/upcoming-costs', async (req, res) => {
 
 router.get('/subscriptions', async (req, res) => {
   try {
-    const data = await statsService.getSubscriptionSummary();
+    const data = await statsService.getSubscriptionSummary(req.userId);
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -33,7 +33,7 @@ router.get('/subscriptions', async (req, res) => {
 
 router.get('/intervals', async (req, res) => {
   try {
-    const data = await statsService.getIntervalStats();
+    const data = await statsService.getIntervalStats(req.userId);
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });

@@ -86,7 +86,7 @@ export default function ItemDetailPage() {
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
               <span className="text-slate-400 text-xs">Next Date</span>
-              <p className="font-medium">{formatDate(item.next_date)}</p>
+              <p className="font-medium">{item.is_evergreen ? 'Never' : formatDate(item.next_date)}</p>
             </div>
             <div>
               <span className="text-slate-400 text-xs">Cancel By</span>

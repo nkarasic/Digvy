@@ -2,7 +2,6 @@ import { format, parseISO, isValid } from 'date-fns';
 
 export function formatDate(dateStr) {
   if (!dateStr) return '—';
-  if (dateStr === 'never') return 'Never';
   try {
     const d = parseISO(dateStr);
     if (!isValid(d)) return dateStr;
@@ -14,7 +13,6 @@ export function formatDate(dateStr) {
 
 export function formatDateShort(dateStr) {
   if (!dateStr) return '—';
-  if (dateStr === 'never') return 'Never';
   try {
     const d = parseISO(dateStr);
     if (!isValid(d)) return dateStr;
@@ -25,7 +23,7 @@ export function formatDateShort(dateStr) {
 }
 
 export function toInputDate(dateStr) {
-  if (!dateStr || dateStr === 'never') return '';
+  if (!dateStr) return '';
   try {
     const d = parseISO(dateStr);
     if (!isValid(d)) return '';

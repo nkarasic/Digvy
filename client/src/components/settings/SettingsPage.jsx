@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom';
-import { Upload, Database, Info } from 'lucide-react';
+import { Upload, Database, Info, LogOut } from 'lucide-react';
 import TopBar from '../layout/TopBar.jsx';
 import PageShell from '../layout/PageShell.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 export default function SettingsPage() {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   return (
     <PageShell>
@@ -29,8 +31,8 @@ export default function SettingsPage() {
               <Database size={20} className="text-slate-600" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-slate-900">Data Backup</h3>
-              <p className="text-xs text-slate-500">Your data is stored in db.json at the project root. Back it up periodically.</p>
+              <h3 className="text-sm font-semibold text-slate-900">Account</h3>
+              <p className="text-xs text-slate-500">{user?.email}</p>
             </div>
           </div>
         </div>
@@ -46,6 +48,18 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
+
+        <button
+          onClick={logout}
+          className="w-full flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm active:bg-slate-50 text-left"
+        >
+          <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+            <LogOut size={20} className="text-red-600" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-red-600">Sign Out</h3>
+          </div>
+        </button>
       </div>
     </PageShell>
   );

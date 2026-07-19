@@ -11,17 +11,16 @@ export default function Modal({ open, onClose, title, children }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center">
+    <div className="fixed inset-0 z-[60] flex items-end justify-center">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white w-full max-w-lg rounded-t-2xl max-h-[85vh] flex flex-col animate-slide-up"
-           style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-        <div className="flex items-center justify-between p-4 border-b border-slate-200">
+      <div className="relative bg-white w-full max-w-lg rounded-t-2xl max-h-[85vh] flex flex-col animate-slide-up">
+        <div className="flex items-center justify-between p-4 border-b border-slate-200 shrink-0">
           <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
           <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600">
             <X size={20} />
           </button>
         </div>
-        <div className="overflow-y-auto p-4">
+        <div className="overflow-y-auto min-h-0 p-4 pb-6">
           {children}
         </div>
       </div>

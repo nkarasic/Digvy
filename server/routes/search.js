@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import Fuse from 'fuse.js';
-import db from '../db.js';
+import supabase from '../db.js';
 import { computeUrgency } from '../services/urgencyService.js';
 import { daysSince } from '../utils/dateHelpers.js';
 
@@ -11,10 +11,24 @@ router.get('/', async (req, res) => {
     const { q } = req.query;
     if (!q || !q.trim()) return res.json([]);
 
-    await db.read();
+    const userId = req.userId;
+
+    const { data: items, error } = await supabase
+      .from('items')
+      .select('*, logs(*)')
+      .eq('user_id', userId);
+
+    if (error) throw new Error(error.message);
+
+    // Sort logs within each item
+    for (const item of items) {
+      if (item.logs) {
+        item.logs.sort((a, b) => (a.date || '').localeCompare(b.date || '') || (a.created_at || '').localeCompare(b.created_at || ''));
+      }
+    }
 
     // Build searchable docs with flattened log notes
-    const docs = db.data.items.map(item => ({
+    const docs = items.map(item => ({
       ...item,
       _logNotes: (item.logs || []).map(l => l.note).join(' '),
     }));

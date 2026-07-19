@@ -5,7 +5,7 @@ const router = Router();
 
 router.get('/', async (req, res) => {
   try {
-    const categories = await itemService.getCategories();
+    const categories = await itemService.getCategories(req.userId);
     res.json(categories);
   } catch (err) {
     res.status(500).json({ error: err.message });

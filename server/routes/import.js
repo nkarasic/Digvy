@@ -2,9 +2,14 @@ import { Router } from 'express';
 import multer from 'multer';
 import { parseCSV } from '../services/csvParser.js';
 import { bulkCreate } from '../services/itemService.js';
+import { validate } from '../middleware/validate.js';
+import { importConfirmSchema } from '../schemas.js';
 
 const router = Router();
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 2 * 1024 * 1024 },
+});
 
 // POST /api/import/preview — parse CSV, return candidates
 router.post('/preview', upload.single('file'), async (req, res) => {
@@ -20,16 +25,10 @@ router.post('/preview', upload.single('file'), async (req, res) => {
 });
 
 // POST /api/import/confirm — write items to DB
-router.post('/confirm', async (req, res) => {
+router.post('/confirm', validate(importConfirmSchema), async (req, res) => {
   try {
-    const { items } = req.body;
-    if (!items || !Array.isArray(items)) {
-      return res.status(400).json({ error: 'Items array required' });
-    }
-
-    // Strip internal fields before saving
-    const cleaned = items.map(({ _warnings, _score, ...item }) => item);
-    const created = await bulkCreate(cleaned);
+    // Schema validation strips internal fields (_warnings, _score)
+    const created = await bulkCreate(req.userId, req.body.items);
     res.status(201).json({ imported: created.length, items: created });
   } catch (err) {
     console.error('Import confirm error:', err);

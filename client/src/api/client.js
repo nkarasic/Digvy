@@ -1,11 +1,26 @@
+import { supabase } from '../lib/supabase.js';
+
 const BASE = '/api';
+
+async function getToken() {
+  // getSession auto-refreshes an expired access token via the refresh token
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token ?? null;
+}
 
 async function request(path, options = {}) {
   const url = `${BASE}${path}`;
+  const token = await getToken();
+
   const config = {
     headers: { 'Content-Type': 'application/json' },
     ...options,
   };
+
+  // Add auth header if we have a token
+  if (token) {
+    config.headers = { ...config.headers, Authorization: `Bearer ${token}` };
+  }
 
   // Don't set Content-Type for FormData
   if (options.body instanceof FormData) {
@@ -13,6 +28,13 @@ async function request(path, options = {}) {
   }
 
   const res = await fetch(url, config);
+
+  // Token invalid despite refresh — sign out (AuthContext flips to LoginPage)
+  if (res.status === 401) {
+    await supabase.auth.signOut();
+    throw new Error('Session expired');
+  }
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));
     throw new Error(err.error || res.statusText);

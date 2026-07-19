@@ -19,7 +19,7 @@ const URGENCY_CHIPS = [
 ];
 
 export default function DashboardPage() {
-  const { data, loading } = useDashboard();
+  const { data, loading, error } = useDashboard();
   const navigate = useNavigate();
 
   // Search state
@@ -167,6 +167,11 @@ export default function DashboardPage() {
         </div>
       ) : loading ? (
         <LoadingSpinner />
+      ) : error ? (
+        <div className="px-4 py-8 text-center">
+          <p className="text-sm text-red-600 mb-1">Couldn't load your items</p>
+          <p className="text-xs text-slate-500">{error}</p>
+        </div>
       ) : filteredActionRequired.length === 0 && filteredNoUpcoming.length === 0 ? (
         hasAnyFilter ? (
           <div className="px-4 py-8 text-center text-sm text-slate-500">

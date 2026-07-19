@@ -10,7 +10,7 @@ export default function ItemForm({ initialData, onSubmit, submitLabel = 'Save' }
   const [logicType, setLogicType] = useState(initialData?.logic_type || 'Fixed');
   const [intervalMonths, setIntervalMonths] = useState(initialData?.interval_months || '');
   const [nextDate, setNextDate] = useState(toInputDate(initialData?.next_date));
-  const [neverExpires, setNeverExpires] = useState(initialData?.next_date === 'never');
+  const [neverExpires, setNeverExpires] = useState(initialData?.is_evergreen === true);
   const [cancelByDate, setCancelByDate] = useState(toInputDate(initialData?.cancel_by_date));
   const [details, setDetails] = useState(initialData?.details || '');
   const [linkUrl, setLinkUrl] = useState(initialData?.link_url || '');
@@ -38,7 +38,8 @@ export default function ItemForm({ initialData, onSubmit, submitLabel = 'Save' }
         status,
         logic_type: logicType,
         interval_months: logicType === 'Interval' ? Number(intervalMonths) || null : null,
-        next_date: neverExpires ? 'never' : (fromInputDate(nextDate) || null),
+        is_evergreen: neverExpires,
+        next_date: neverExpires ? null : (fromInputDate(nextDate) || null),
         cancel_by_date: fromInputDate(cancelByDate) || null,
         date_type: logicType !== 'Reference' ? dateType : 'firm',
         booking_lead_days: dateType === 'flexible' ? (Number(bookingLeadDays) || 21) : null,

@@ -79,8 +79,8 @@ function TriageCard({ item, index, onUpdate }) {
         </select>
       </div>
 
-      {item.next_date && (
-        <p className="text-xs text-slate-500">Next: {formatDate(item.next_date)}</p>
+      {(item.next_date || item.is_evergreen) && (
+        <p className="text-xs text-slate-500">Next: {item.is_evergreen ? 'Never' : formatDate(item.next_date)}</p>
       )}
 
       {item._warnings && item._warnings.length > 0 && (

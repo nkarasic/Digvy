@@ -101,9 +101,10 @@ export function parseCSV(csvContent) {
 
     // Parse next_date
     let next_date = null;
+    let is_evergreen = false;
     const nextLower = nextTimeStr.toLowerCase().trim();
     if (nextLower === 'never' || nextLower === 'never expire') {
-      next_date = 'never';
+      is_evergreen = true;
     } else if (nextTimeStr) {
       const nd = parseUSDate(nextTimeStr);
       if (nd) next_date = toISODate(nd);
@@ -134,7 +135,7 @@ export function parseCSV(csvContent) {
 
     // "Cancel by end of promo period" — use next_date as cancel_by_date
     if (!cancel_by_date && notes && /cancel\s+by\s+end\s+of\s+promo/i.test(notes)) {
-      cancel_by_date = next_date !== 'never' ? next_date : null;
+      cancel_by_date = next_date;
     }
 
     // Extract price and time from notes
@@ -162,6 +163,7 @@ export function parseCSV(csvContent) {
       logic_type: logicType,
       interval_months: null,
       next_date,
+      is_evergreen,
       cancel_by_date,
       details,
       link_url: null,
@@ -170,7 +172,7 @@ export function parseCSV(csvContent) {
 
     // Add warnings for triage
     const warnings = [];
-    if (status === 'Active' && next_date && next_date !== 'never') {
+    if (status === 'Active' && next_date) {
       const days = daysUntil(next_date);
       if (days !== null && days < 0) {
         warnings.push(`Overdue by ${Math.abs(days)} days`);
