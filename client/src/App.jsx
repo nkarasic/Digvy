@@ -13,6 +13,11 @@ import ImportPage from './components/import/ImportPage.jsx';
 import ItemDetailPage from './components/items/ItemDetailPage.jsx';
 import ItemCreatePage from './components/items/ItemCreatePage.jsx';
 import ItemEditPage from './components/items/ItemEditPage.jsx';
+import AdminGate from './components/admin/AdminGate.jsx';
+import AdminDashboardPage from './components/admin/AdminDashboardPage.jsx';
+import AdminUserDetailPage from './components/admin/AdminUserDetailPage.jsx';
+import AdminAuditPage from './components/admin/AdminAuditPage.jsx';
+import AdminDigestRunsPage from './components/admin/AdminDigestRunsPage.jsx';
 import NotFoundPage from './components/NotFoundPage.jsx';
 
 function AuthenticatedApp() {
@@ -27,6 +32,10 @@ function AuthenticatedApp() {
           <Route path="/items/new" element={<ItemCreatePage />} />
           <Route path="/items/:id" element={<ItemDetailPage />} />
           <Route path="/items/:id/edit" element={<ItemEditPage />} />
+          <Route path="/admin" element={<AdminGate><AdminDashboardPage /></AdminGate>} />
+          <Route path="/admin/users/:id" element={<AdminGate><AdminUserDetailPage /></AdminGate>} />
+          <Route path="/admin/audit" element={<AdminGate><AdminAuditPage /></AdminGate>} />
+          <Route path="/admin/digest-runs" element={<AdminGate><AdminDigestRunsPage /></AdminGate>} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         <BottomNav />

@@ -79,4 +79,21 @@ export const api = {
   getUpcomingCosts: (days) => request(`/stats/upcoming-costs${days ? `?days=${days}` : ''}`),
   getSubscriptions: () => request('/stats/subscriptions'),
   getIntervals: () => request('/stats/intervals'),
+
+  // Admin / customer-service console (requires operator role; 403 otherwise)
+  admin: {
+    whoami: () => request('/admin/whoami'),
+    metrics: () => request('/admin/metrics'),
+    users: (q) => request(`/admin/users${q ? `?q=${encodeURIComponent(q)}` : ''}`),
+    user: (id) => request(`/admin/users/${id}`),
+    userItems: (id) => request(`/admin/users/${id}/items`),
+    userLogs: (id) => request(`/admin/users/${id}/logs`),
+    audit: () => request('/admin/audit'),
+    digestRuns: () => request('/admin/digest-runs'),
+    resendDigest: (id, dryRun) =>
+      request(`/admin/users/${id}/digest`, { method: 'POST', body: JSON.stringify({ dryRun }) }),
+    setUserDigest: (id, digest_enabled) =>
+      request(`/admin/users/${id}/preferences`, { method: 'PATCH', body: JSON.stringify({ digest_enabled }) }),
+    sendPasswordReset: (id) => request(`/admin/users/${id}/password-reset`, { method: 'POST' }),
+  },
 };

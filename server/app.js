@@ -5,6 +5,7 @@ import rateLimit from 'express-rate-limit';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { requireAuth } from './middleware/auth.js';
+import { requireAdmin } from './middleware/requireAdmin.js';
 import itemRoutes from './routes/items.js';
 import logRoutes from './routes/logs.js';
 import categoryRoutes from './routes/categories.js';
@@ -13,6 +14,7 @@ import importRoutes from './routes/import.js';
 import statsRoutes from './routes/stats.js';
 import digestRoutes from './routes/digest.js';
 import emailRoutes from './routes/email.js';
+import adminRoutes from './routes/admin/index.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -41,6 +43,10 @@ app.use('/api/categories', requireAuth, categoryRoutes);
 app.use('/api/search', requireAuth, searchRoutes);
 app.use('/api/import', requireAuth, importRoutes);
 app.use('/api/stats', requireAuth, statsRoutes);
+
+// Operator console. requireAuth verifies the JWT; requireAdmin() enforces at
+// least the 'support' role. Destructive routes inside re-gate for 'admin'.
+app.use('/api/admin', requireAuth, requireAdmin(), adminRoutes);
 
 // These manage their own auth: CRON_SECRET for the digest trigger,
 // unsubscribe token or per-route JWT for email preferences

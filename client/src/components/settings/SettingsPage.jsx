@@ -1,11 +1,32 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, Database, Info, LogOut, Mail } from 'lucide-react';
+import { Upload, Database, Info, LogOut, Mail, ShieldCheck } from 'lucide-react';
 import TopBar from '../layout/TopBar.jsx';
 import PageShell from '../layout/PageShell.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useApp } from '../../context/AppContext.jsx';
 import { api } from '../../api/client.js';
+import { useOperatorRole } from '../../hooks/useOperatorRole.js';
+
+function AdminConsoleLink() {
+  const navigate = useNavigate();
+  const { role } = useOperatorRole();
+  if (!role) return null;
+  return (
+    <button
+      onClick={() => navigate('/admin')}
+      className="w-full flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm active:bg-slate-50 text-left"
+    >
+      <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center">
+        <ShieldCheck size={20} className="text-white" />
+      </div>
+      <div>
+        <h3 className="text-sm font-semibold text-slate-900">Admin Console</h3>
+        <p className="text-xs text-slate-500 capitalize">{role} access</p>
+      </div>
+    </button>
+  );
+}
 
 function DigestToggle() {
   const { showToast } = useApp();
@@ -88,6 +109,8 @@ export default function SettingsPage() {
         </button>
 
         <DigestToggle />
+
+        <AdminConsoleLink />
 
         <div className="bg-white rounded-xl p-4 shadow-sm">
           <div className="flex items-center gap-3">

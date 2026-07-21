@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase.js';
+import { resetOperatorRole } from '../hooks/useOperatorRole.js';
 
 const AuthContext = createContext();
 
@@ -23,7 +24,10 @@ export function AuthProvider({ children }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
       if (event === 'PASSWORD_RECOVERY') setPasswordRecovery(true);
-      if (event === 'SIGNED_OUT') setPasswordRecovery(false);
+      if (event === 'SIGNED_OUT') {
+        setPasswordRecovery(false);
+        resetOperatorRole();
+      }
     });
 
     return () => subscription.unsubscribe();
