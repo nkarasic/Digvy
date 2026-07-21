@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Digvy — never miss a renewal, appointment, or cancel-by deadline">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <g transform="translate(90 96)">
+    <circle cx="26" cy="26" r="26" fill="#2563eb"/>
+    <text x="70" y="38" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="40" font-weight="700" fill="#f8fafc">Digvy</text>
+  </g>
+  <text x="90" y="290" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="66" font-weight="800" fill="#f8fafc">Never miss a renewal,</text>
+  <text x="90" y="368" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="66" font-weight="800" fill="#f8fafc">appointment, or</text>
+  <text x="90" y="446" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="66" font-weight="800" fill="#60a5fa">cancel-by deadline.</text>
+  <text x="90" y="536" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="30" font-weight="400" fill="#94a3b8">Track the life events you deal with a few times a year — not a few times a day.</text>
+</svg>

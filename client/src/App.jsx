@@ -1,7 +1,7 @@
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { AppProvider } from './context/AppContext.jsx';
-import LoginPage from './components/auth/LoginPage.jsx';
+import LandingPage from './components/auth/LandingPage.jsx';
 import UpdatePasswordPage from './components/auth/UpdatePasswordPage.jsx';
 import LoadingSpinner from './components/common/LoadingSpinner.jsx';
 import BottomNav from './components/layout/BottomNav.jsx';
@@ -53,7 +53,7 @@ function AppRoot() {
     return <div className="min-h-screen flex items-center justify-center"><LoadingSpinner /></div>;
   }
   if (passwordRecovery) return <UpdatePasswordPage />;
-  return user ? <AuthenticatedApp /> : <LoginPage />;
+  return user ? <AuthenticatedApp /> : <LandingPage />;
 }
 
 export default function App() {

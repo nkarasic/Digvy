@@ -7,9 +7,9 @@ const COPY = {
   reset: { subtitle: 'Reset your password', button: 'Send Reset Link' },
 };
 
-export default function LoginPage() {
+export default function LoginPage({ initialMode = 'signin', embedded = false }) {
   const { login, signup, resetPassword, loading, error, clearError } = useAuth();
-  const [mode, setMode] = useState('signin'); // signin | signup | reset
+  const [mode, setMode] = useState(initialMode); // signin | signup | reset
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [localError, setLocalError] = useState(null);
@@ -53,11 +53,19 @@ export default function LoginPage() {
 
   const displayError = localError || error;
 
+  const containerClass = embedded
+    ? 'w-full flex items-center justify-center px-4'
+    : 'min-h-screen flex items-center justify-center bg-gray-50 px-4';
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className={containerClass}>
       <div className="w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-center text-gray-900 mb-1">Digvy</h1>
-        <p className="text-sm text-center text-gray-500 mb-6">{COPY[mode].subtitle}</p>
+        {!embedded && (
+          <>
+            <h1 className="text-2xl font-bold text-center text-gray-900 mb-1">Digvy</h1>
+            <p className="text-sm text-center text-gray-500 mb-6">{COPY[mode].subtitle}</p>
+          </>
+        )}
 
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
           {displayError && (

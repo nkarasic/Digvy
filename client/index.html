@@ -8,10 +8,191 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="theme-color" content="#1e293b" />
     <link rel="manifest" href="/manifest.json" />
-    <title>Digvy</title>
+
+    <!-- Primary SEO -->
+    <title>Digvy — Get life’s admin off your mind</title>
+    <meta
+      name="description"
+      content="Digvy tracks the infrequent life events that slip through the cracks — recurring maintenance, subscriptions, renewals, appointments, and free-trial cancel-by deadlines. It surfaces what needs action and keeps a searchable history of everything else."
+    />
+    <link rel="canonical" href="https://digvy.vercel.app/" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Digvy" />
+    <meta property="og:url" content="https://digvy.vercel.app/" />
+    <meta property="og:title" content="Digvy — Get life’s admin off your mind" />
+    <meta
+      property="og:description"
+      content="Track the things you deal with a few times a year — maintenance, subscriptions, renewals, appointments, and cancel-by deadlines. Digvy shows what needs action and keeps the rest searchable."
+    />
+    <meta property="og:image" content="https://digvy.vercel.app/og-image.svg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Digvy — Get life’s admin off your mind" />
+    <meta
+      name="twitter:description"
+      content="Track the things you deal with a few times a year — maintenance, subscriptions, renewals, appointments, and cancel-by deadlines. Digvy shows what needs action and keeps the rest searchable."
+    />
+    <meta name="twitter:image" content="https://digvy.vercel.app/og-image.svg" />
+
+    <!--
+      Structured data for search engines and LLM / generative-answer crawlers (GEO).
+      Lives in the initial HTML payload so it is readable without executing JS.
+    -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "SoftwareApplication",
+          "name": "Digvy",
+          "applicationCategory": "ProductivityApplication",
+          "operatingSystem": "Web",
+          "url": "https://digvy.vercel.app/",
+          "description": "Digvy is a web app for managing infrequent life events — recurring maintenance, subscriptions, appointments, renewals, cancel-by deadlines, and one-time reference records. Its dashboard surfaces what needs action (overdue, due soon, and cancel-by deadlines) and keeps a searchable history of everything else.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "featureList": [
+            "Track recurring maintenance and appointments",
+            "Manage subscriptions and renewals",
+            "Get reminders before free-trial cancel-by deadlines",
+            "Store one-time reference records (warranties, account numbers)",
+            "A dashboard that surfaces overdue and due-soon items",
+            "Full-text search across everything you track",
+            "Daily email digest of what needs action",
+            "CSV import"
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is Digvy?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Digvy is a web app for tracking infrequent life events — the things you deal with a few times a year rather than a few times a day. That includes recurring maintenance, subscriptions, appointments, renewals, free-trial cancel-by deadlines, and one-time reference records like warranties or account numbers."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How is Digvy different from a to-do app or calendar?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "To-do apps and calendars are built for things happening today or this week. Digvy is built for events that recur on long, irregular cycles — every 3 months, every year, or on a one-off deadline. Instead of a flat list, it surfaces only what needs action now (overdue, due soon, or approaching a cancel-by date) and keeps everything else out of the way but searchable."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can Digvy remind me before a free trial renews?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. Digvy tracks cancel-by deadlines as a first-class field. When a free trial or auto-renewing subscription has a date you must cancel before, Digvy flags it as it approaches and includes it in a daily email digest so you can cancel in time instead of getting charged."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "What kinds of things can I track in Digvy?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Recurring maintenance (HVAC filters, gutter cleaning, oil changes), subscriptions and renewals (domains, memberships, insurance policies), appointments (dentist, eye exam, physical), cancel-by deadlines for trials and auto-renewals, and one-time reference records you just need to find later (warranty details, model numbers, account numbers)."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How much does Digvy cost?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Digvy is free to use. You create an account with an email and password to get started."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Do I have to enter everything by hand?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No. You can import your existing list from a CSV file, and Digvy offers starter suggestions for common items when you first sign up so you can get going in a couple of minutes."
+              }
+            }
+          ]
+        }
+      ]
+    }
+    </script>
   </head>
   <body class="bg-slate-50 text-slate-900">
-    <div id="root"></div>
+    <!--
+      Static, crawlable marketing content lives INSIDE #root on purpose.
+
+      Digvy is a client-rendered Vite SPA served as a static file on Vercel, so
+      without this block search / LLM crawlers that don't run JS would see an
+      empty page. React 18's createRoot().render() replaces the children of its
+      container on mount, so this content is:
+        - visible to no-JS crawlers in the very first HTML payload, and
+        - automatically wiped and replaced by the React app for real visitors.
+
+      Tradeoff (intentional): this is NOT true SSR/hydration. This block and the
+      React <LandingPage> duplicate copy, and only this block is what no-JS
+      crawlers actually read — so keep it genuinely complete. For maximum GEO
+      strength or per-route prerendering, the next step would be adding a
+      build-time prerender/SSG step; that was deliberately skipped to avoid
+      adding a build pipeline for a single page.
+    -->
+    <div id="root">
+      <main style="max-width: 42rem; margin: 0 auto; padding: 3rem 1.5rem; font-family: system-ui, sans-serif; line-height: 1.6;">
+        <h1>Get life&rsquo;s admin off your mind</h1>
+        <p>
+          Digvy holds the infrequent life events that slip through the cracks so
+          you don&rsquo;t have to remember them: recurring maintenance,
+          subscriptions, renewals, appointments, and the free-trial cancel-by
+          deadlines that quietly turn into charges. It surfaces what needs action
+          now and keeps a searchable history of everything else.
+        </p>
+
+        <h2>What Digvy keeps track of</h2>
+        <ul>
+          <li><strong>Recurring maintenance</strong> — HVAC filters, gutter cleaning, oil changes, and other every-few-months chores.</li>
+          <li><strong>Subscriptions &amp; renewals</strong> — domains, memberships, and insurance policies that come due once a year.</li>
+          <li><strong>Appointments</strong> — the dentist, eye exam, or annual physical that&rsquo;s easy to let slide.</li>
+          <li><strong>Cancel-by deadlines</strong> — free trials and auto-renewals you need to cancel <em>before</em> a specific date.</li>
+          <li><strong>One-time reference records</strong> — warranty details, model numbers, and account numbers you just need to find later.</li>
+        </ul>
+
+        <h2>How it works</h2>
+        <ol>
+          <li><strong>Add or import your items.</strong> Type them in, pick from starter suggestions, or import a CSV.</li>
+          <li><strong>See what needs action.</strong> The dashboard surfaces what&rsquo;s overdue, due soon, or approaching a cancel-by deadline.</li>
+          <li><strong>Find everything else instantly.</strong> Everything you&rsquo;re tracking stays in a searchable history, out of the way until you need it.</li>
+        </ol>
+
+        <h2>Frequently asked questions</h2>
+        <h3>How is Digvy different from a to-do app or calendar?</h3>
+        <p>
+          To-do apps and calendars are built for things happening today or this
+          week. Digvy is built for events that recur on long, irregular cycles —
+          every 3 months, every year, or on a one-off deadline. It surfaces only
+          what needs action now and keeps everything else searchable.
+        </p>
+        <h3>Can Digvy remind me before a free trial renews?</h3>
+        <p>
+          Yes. Digvy tracks cancel-by deadlines as a first-class field, flags
+          them as they approach, and includes them in a daily email digest so you
+          can cancel in time instead of getting charged.
+        </p>
+        <h3>How much does Digvy cost?</h3>
+        <p>Digvy is free to use. Create an account with an email and password to get started.</p>
+
+        <p><a href="/#signup">Get started free</a> &middot; <a href="/#signup">Sign in</a></p>
+      </main>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
