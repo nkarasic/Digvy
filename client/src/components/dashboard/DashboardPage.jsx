@@ -181,14 +181,22 @@ export default function DashboardPage() {
           <EmptyState
             icon={Inbox}
             title="No items yet"
-            description="Import a CSV or create your first item"
+            description="Add a few common things to track, or create your own"
             action={
-              <button
-                onClick={() => navigate('/settings')}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium"
-              >
-                Get Started
-              </button>
+              <div className="flex flex-col items-center gap-2">
+                <button
+                  onClick={() => navigate('/welcome')}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium"
+                >
+                  Browse suggestions
+                </button>
+                <button
+                  onClick={() => navigate('/items/new')}
+                  className="text-sm text-slate-500"
+                >
+                  Create an item manually
+                </button>
+              </div>
             }
           />
         )

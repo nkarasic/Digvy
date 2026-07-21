@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Upload, Database, Info, LogOut, Mail, ShieldCheck } from 'lucide-react';
+import { Upload, Database, Info, LogOut, Mail, ShieldCheck, Sparkles } from 'lucide-react';
 import TopBar from '../layout/TopBar.jsx';
 import PageShell from '../layout/PageShell.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
@@ -96,11 +96,24 @@ export default function SettingsPage() {
       <TopBar title="Settings" />
       <div className="px-4 py-4 space-y-3">
         <button
-          onClick={() => navigate('/import')}
+          onClick={() => navigate('/welcome')}
           className="w-full flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm active:bg-slate-50 text-left"
         >
           <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-            <Upload size={20} className="text-blue-600" />
+            <Sparkles size={20} className="text-blue-600" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900">Add from suggestions</h3>
+            <p className="text-xs text-slate-500">Pick from common things to track</p>
+          </div>
+        </button>
+
+        <button
+          onClick={() => navigate('/import')}
+          className="w-full flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm active:bg-slate-50 text-left"
+        >
+          <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
+            <Upload size={20} className="text-slate-600" />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-slate-900">Import CSV</h3>

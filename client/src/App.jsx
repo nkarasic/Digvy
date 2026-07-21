@@ -10,6 +10,7 @@ import DashboardPage from './components/dashboard/DashboardPage.jsx';
 import StatsPage from './components/stats/StatsPage.jsx';
 import SettingsPage from './components/settings/SettingsPage.jsx';
 import ImportPage from './components/import/ImportPage.jsx';
+import WelcomePage from './components/onboarding/WelcomePage.jsx';
 import ItemDetailPage from './components/items/ItemDetailPage.jsx';
 import ItemCreatePage from './components/items/ItemCreatePage.jsx';
 import ItemEditPage from './components/items/ItemEditPage.jsx';
@@ -29,6 +30,7 @@ function AuthenticatedApp() {
           <Route path="/stats" element={<StatsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/import" element={<ImportPage />} />
+          <Route path="/welcome" element={<WelcomePage />} />
           <Route path="/items/new" element={<ItemCreatePage />} />
           <Route path="/items/:id" element={<ItemDetailPage />} />
           <Route path="/items/:id/edit" element={<ItemEditPage />} />
