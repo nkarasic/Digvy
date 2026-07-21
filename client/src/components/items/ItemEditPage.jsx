@@ -18,7 +18,9 @@ export default function ItemEditPage() {
       await api.updateItem(id, data);
       showToast('Item updated');
       triggerRefresh();
-      navigate(`/items/${id}`, { replace: true });
+      // Pop the edit entry to return to the existing detail entry, rather than
+      // replacing edit with a duplicate detail entry (which made "back" no-op once).
+      navigate(-1);
     } catch (err) {
       showToast(err.message, 'error');
     }
