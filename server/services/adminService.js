@@ -275,3 +275,46 @@ export async function listDigestRuns(limit = 25) {
   if (error) throw new Error(error.message);
   return data;
 }
+
+// --- Phase 4: destructive actions (admin tier only) ---
+
+// Effectively-indefinite ban; Supabase has no "forever", so use ~100 years.
+const SUSPEND_DURATION = '876000h';
+
+// Suspend or unsuspend a user via Supabase's native ban, so a suspended user
+// genuinely can't obtain a token.
+export async function setUserSuspended({ actorId, userId, suspend }) {
+  const { error } = await supabase.auth.admin.updateUserById(userId, {
+    ban_duration: suspend ? SUSPEND_DURATION : 'none',
+  });
+  if (error) throw new Error(error.message);
+  await logAudit({
+    actorId,
+    action: suspend ? 'user.suspend' : 'user.unsuspend',
+    targetUserId: userId,
+  });
+  return { suspended: suspend };
+}
+
+// Delete a user and all their data. FK cascades drop items, logs,
+// email_preferences, and admin_users; admin_audit.target_user_id has no FK, so
+// the deletion record itself survives. Returns null if the user is gone.
+export async function deleteUser({ actorId, userId }) {
+  const detail = await getUserDetail(userId);
+  if (!detail) return null;
+
+  const { error } = await supabase.auth.admin.deleteUser(userId);
+  if (error) throw new Error(error.message);
+
+  await logAudit({
+    actorId,
+    action: 'user.delete',
+    targetUserId: userId,
+    payload: {
+      email: detail.email,
+      item_count: detail.item_count,
+      log_count: detail.log_count,
+    },
+  });
+  return { deleted: true, email: detail.email };
+}

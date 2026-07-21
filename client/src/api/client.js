@@ -95,5 +95,8 @@ export const api = {
     setUserDigest: (id, digest_enabled) =>
       request(`/admin/users/${id}/preferences`, { method: 'PATCH', body: JSON.stringify({ digest_enabled }) }),
     sendPasswordReset: (id) => request(`/admin/users/${id}/password-reset`, { method: 'POST' }),
+    suspendUser: (id, suspend) =>
+      request(`/admin/users/${id}/suspend`, { method: 'POST', body: JSON.stringify({ suspend }) }),
+    deleteUser: (id) => request(`/admin/users/${id}`, { method: 'DELETE' }),
   },
 };

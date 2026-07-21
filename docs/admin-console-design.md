@@ -199,7 +199,14 @@ table, and toast components.
    user detail (preview modal, send, toggle, reset), `AdminDigestRunsPage`, digest
    tile + link on dashboard.
 4. **Destructive / admin-only** — suspend, delete, bulk ops. Extra confirmation,
-   `admin` tier enforced, heavily audited.
+   `admin` tier enforced, heavily audited. **DONE (suspend + delete).**
+   `adminService.setUserSuspended` (Supabase `ban_duration`) and `deleteUser`
+   (auth delete; FK cascades drop items/logs/prefs/roles, audit row survives).
+   Routes `POST /admin/users/:id/suspend` and `DELETE /admin/users/:id`, both
+   behind `requireAdmin('admin')` and a self-action guard (400 on your own id).
+   Client: admin-only Danger Zone on user detail — suspend/unsuspend button and
+   a typed-email delete confirmation modal; hidden on your own account. Bulk ops
+   not built.
 
 ## 7. Open questions / risks
 

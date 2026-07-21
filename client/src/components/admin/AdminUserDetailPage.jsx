@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Mail, Package, ClipboardList, CheckCircle2, XCircle, Send, Eye, KeyRound, Bell, BellOff } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Mail, Package, ClipboardList, CheckCircle2, XCircle, Send, Eye, KeyRound, Bell, BellOff, Ban, ShieldCheck, Trash2 } from 'lucide-react';
 import TopBar from '../layout/TopBar.jsx';
 import PageShell from '../layout/PageShell.jsx';
 import LoadingSpinner from '../common/LoadingSpinner.jsx';
 import Modal from '../common/Modal.jsx';
 import { api } from '../../api/client.js';
 import { useApp } from '../../context/AppContext.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { useAdminRole } from './AdminGate.jsx';
 
 const fmtDate = (iso) => (iso ? new Date(iso).toLocaleString() : '—');
 const money = (v) => (v != null ? `$${Number(v).toFixed(2)}` : '');
@@ -31,13 +33,21 @@ function Section({ title, children }) {
 
 export default function AdminUserDetailPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { showToast } = useApp();
+  const { user: authUser } = useAuth();
+  const role = useAdminRole();
   const [user, setUser] = useState(null);
   const [items, setItems] = useState(null);
   const [logs, setLogs] = useState(null);
   const [tab, setTab] = useState('items');
   const [busy, setBusy] = useState(null); // which action is running
   const [preview, setPreview] = useState(null); // dry-run digest result
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteText, setDeleteText] = useState('');
+
+  const isSelf = authUser?.id === id;
+  const suspended = user?.banned_until && new Date(user.banned_until) > new Date();
 
   const loadUser = () => api.admin.user(id).then(setUser).catch(() => setUser(false));
 
@@ -102,6 +112,31 @@ export default function AdminUserDetailPage() {
     }
   };
 
+  const toggleSuspend = async () => {
+    setBusy('suspend');
+    try {
+      await api.admin.suspendUser(id, !suspended);
+      showToast(suspended ? 'User unsuspended' : 'User suspended');
+      await loadUser();
+    } catch (e) {
+      showToast(e.message || 'Could not update suspension', 'error');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const doDelete = async () => {
+    setBusy('delete');
+    try {
+      await api.admin.deleteUser(id);
+      showToast(`Deleted ${user.email}`);
+      navigate('/admin', { replace: true });
+    } catch (e) {
+      showToast(e.message || 'Could not delete user', 'error');
+      setBusy(null);
+    }
+  };
+
   return (
     <PageShell>
       <TopBar title="User" showBack />
@@ -117,6 +152,11 @@ export default function AdminUserDetailPage() {
                   {user.role && (
                     <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-slate-900 text-white">
                       {user.role}
+                    </span>
+                  )}
+                  {suspended && (
+                    <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-red-100 text-red-700">
+                      suspended
                     </span>
                   )}
                 </div>
@@ -240,9 +280,62 @@ export default function AdminUserDetailPage() {
                 />
               )}
             </div>
+
+            {role === 'admin' && !isSelf && (
+              <Section title="Danger zone">
+                <div className="border border-red-200 rounded-xl p-3 space-y-2">
+                  <button
+                    onClick={toggleSuspend}
+                    disabled={!!busy}
+                    className="w-full flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-amber-700 bg-amber-50 active:bg-amber-100 disabled:opacity-50"
+                  >
+                    {suspended ? <ShieldCheck size={16} /> : <Ban size={16} />}
+                    <span>{busy === 'suspend' ? 'Working…' : suspended ? 'Unsuspend user' : 'Suspend user'}</span>
+                  </button>
+                  <button
+                    onClick={() => { setDeleteText(''); setConfirmDelete(true); }}
+                    disabled={!!busy}
+                    className="w-full flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-red-700 bg-red-50 active:bg-red-100 disabled:opacity-50"
+                  >
+                    <Trash2 size={16} />
+                    <span>Delete user &amp; all data</span>
+                  </button>
+                </div>
+              </Section>
+            )}
+            {role === 'admin' && isSelf && (
+              <p className="text-[11px] text-slate-400 px-1">
+                Suspend and delete are hidden on your own account.
+              </p>
+            )}
           </>
         )}
       </div>
+
+      <Modal open={confirmDelete} onClose={() => !busy && setConfirmDelete(false)} title="Delete user">
+        {user && (
+          <div>
+            <p className="text-sm text-slate-600">
+              This permanently deletes <span className="font-semibold text-slate-900">{user.email}</span> and
+              all {user.item_count} items and {user.log_count} logs. This cannot be undone.
+            </p>
+            <label className="block text-xs text-slate-500 mt-4 mb-1">Type the email to confirm</label>
+            <input
+              value={deleteText}
+              onChange={(e) => setDeleteText(e.target.value)}
+              placeholder={user.email}
+              className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-red-500"
+            />
+            <button
+              onClick={doDelete}
+              disabled={deleteText !== user.email || busy === 'delete'}
+              className="w-full mt-4 rounded-xl px-3 py-2.5 text-sm font-semibold text-white bg-red-600 active:bg-red-700 disabled:opacity-40"
+            >
+              {busy === 'delete' ? 'Deleting…' : 'Permanently delete'}
+            </button>
+          </div>
+        )}
+      </Modal>
 
       <Modal open={!!preview} onClose={() => setPreview(null)} title="Digest preview">
         {preview && (

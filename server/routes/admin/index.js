@@ -1,9 +1,14 @@
 import { Router } from 'express';
 import * as adminService from '../../services/adminService.js';
 import { validate } from '../../middleware/validate.js';
+import { requireAdmin } from '../../middleware/requireAdmin.js';
 import { emailPreferencesSchema } from '../../schemas.js';
 
 const router = Router();
+
+// Destructive routes require the admin tier (the router as a whole only
+// requires 'support').
+const adminOnly = requireAdmin('admin');
 
 // Mounted behind requireAuth + requireAdmin('support') in app.js, so every
 // route here already has a verified JWT (req.userId) and an operator role
@@ -120,6 +125,39 @@ router.post('/users/:id/password-reset', async (req, res) => {
       actorId: req.userId,
       userId: req.params.id,
     });
+    if (!result) return res.status(404).json({ error: 'User not found' });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// --- Destructive actions (admin tier; never on your own account) ---
+
+// Suspend or unsuspend a user. Body { suspend: bool }.
+router.post('/users/:id/suspend', adminOnly, async (req, res) => {
+  if (req.params.id === req.userId) {
+    return res.status(400).json({ error: "You can't suspend your own account." });
+  }
+  try {
+    const suspend = req.body?.suspend === true;
+    res.json(await adminService.setUserSuspended({
+      actorId: req.userId,
+      userId: req.params.id,
+      suspend,
+    }));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Delete a user and all their data.
+router.delete('/users/:id', adminOnly, async (req, res) => {
+  if (req.params.id === req.userId) {
+    return res.status(400).json({ error: "You can't delete your own account." });
+  }
+  try {
+    const result = await adminService.deleteUser({ actorId: req.userId, userId: req.params.id });
     if (!result) return res.status(404).json({ error: 'User not found' });
     res.json(result);
   } catch (err) {
