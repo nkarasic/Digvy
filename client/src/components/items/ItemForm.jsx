@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../api/client.js';
-import { CATEGORIES, INTERVAL_PRESETS } from '../../utils/constants.js';
+import { CATEGORIES, INTERVAL_PRESETS, BILLING_PERIOD_PRESETS } from '../../utils/constants.js';
 import { toInputDate, fromInputDate } from '../../utils/dateFormat.js';
 
 export default function ItemForm({ initialData, onSubmit, submitLabel = 'Save' }) {
@@ -9,6 +9,7 @@ export default function ItemForm({ initialData, onSubmit, submitLabel = 'Save' }
   const [status, setStatus] = useState(initialData?.status || 'Active');
   const [logicType, setLogicType] = useState(initialData?.logic_type || 'Fixed');
   const [intervalMonths, setIntervalMonths] = useState(initialData?.interval_months || '');
+  const [billingPeriodMonths, setBillingPeriodMonths] = useState(initialData?.billing_period_months || '');
   const [nextDate, setNextDate] = useState(toInputDate(initialData?.next_date));
   const [neverExpires, setNeverExpires] = useState(initialData?.is_evergreen === true);
   const [cancelByDate, setCancelByDate] = useState(toInputDate(initialData?.cancel_by_date));
@@ -38,6 +39,7 @@ export default function ItemForm({ initialData, onSubmit, submitLabel = 'Save' }
         status,
         logic_type: logicType,
         interval_months: logicType === 'Interval' ? Number(intervalMonths) || null : null,
+        billing_period_months: category === 'Subscription' ? Number(billingPeriodMonths) || null : null,
         is_evergreen: neverExpires,
         next_date: neverExpires ? null : (fromInputDate(nextDate) || null),
         cancel_by_date: fromInputDate(cancelByDate) || null,
@@ -127,6 +129,37 @@ export default function ItemForm({ initialData, onSubmit, submitLabel = 'Save' }
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
             placeholder="Custom months"
           />
+        </div>
+      )}
+
+      {category === 'Subscription' && (
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Billing period</label>
+          <div className="flex gap-2 mb-2 flex-wrap">
+            {BILLING_PERIOD_PRESETS.map(({ label, value }) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setBillingPeriodMonths(value)}
+                className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                  Number(billingPeriodMonths) === value
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white text-slate-600 border-slate-300'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <input
+            type="number"
+            min="1"
+            value={billingPeriodMonths}
+            onChange={e => setBillingPeriodMonths(e.target.value)}
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+            placeholder="Custom months (e.g. 1 = monthly)"
+          />
+          <p className="mt-1 text-xs text-slate-400">Used to estimate annual cost on the Stats page.</p>
         </div>
       )}
 

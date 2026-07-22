@@ -4,6 +4,7 @@ import PageShell from '../layout/PageShell.jsx';
 import LoadingSpinner from '../common/LoadingSpinner.jsx';
 import { useSpendByCategory, useUpcomingCosts, useSubscriptions } from '../../hooks/useStats.js';
 import { formatDate } from '../../utils/dateFormat.js';
+import { billingPeriodLabel } from '../../utils/constants.js';
 
 function SpendByCategory({ data, months, onMonthsChange }) {
   const max = data[0]?.total || 1;
@@ -104,7 +105,12 @@ function SubscriptionSummary({ data }) {
             <div key={sub.id} className="flex justify-between py-1.5 text-sm">
               <span className="text-slate-700">{sub.name}</span>
               {sub.last_price != null && (
-                <span className="text-slate-500">${sub.last_price.toFixed(2)}</span>
+                <span className="text-slate-500">
+                  ${sub.last_price.toFixed(2)}
+                  {billingPeriodLabel(sub.billing_period_months) && (
+                    <span className="text-slate-400"> · {billingPeriodLabel(sub.billing_period_months)}</span>
+                  )}
+                </span>
               )}
             </div>
           ))}

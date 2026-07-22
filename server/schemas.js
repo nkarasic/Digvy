@@ -20,6 +20,7 @@ export const itemCreateSchema = z.object({
   status: z.enum(['Active', 'Inactive', 'Historical']).optional(),
   logic_type: z.enum(['Fixed', 'Interval', 'Reference']).optional(),
   interval_months: z.union([z.number().int().min(1).max(600), z.null()]).optional(),
+  billing_period_months: z.union([z.number().int().min(1).max(600), z.null()]).optional(),
   next_date: optionalDate,
   is_evergreen: z.boolean().optional(),
   cancel_by_date: optionalDate,

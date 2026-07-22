@@ -13,6 +13,7 @@ import { useItem } from '../../hooks/useItems.js';
 import { useApp } from '../../context/AppContext.jsx';
 import { api } from '../../api/client.js';
 import { formatDate } from '../../utils/dateFormat.js';
+import { billingPeriodLabel } from '../../utils/constants.js';
 
 export default function ItemDetailPage() {
   const { id } = useParams();
@@ -96,6 +97,12 @@ export default function ItemDetailPage() {
               <div>
                 <span className="text-slate-400 text-xs">Interval</span>
                 <p className="font-medium">{item.interval_months} months</p>
+              </div>
+            )}
+            {item.billing_period_months != null && (
+              <div>
+                <span className="text-slate-400 text-xs">Billing period</span>
+                <p className="font-medium">{billingPeriodLabel(item.billing_period_months)}</p>
               </div>
             )}
             {item.date_type && (

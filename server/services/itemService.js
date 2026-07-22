@@ -102,6 +102,7 @@ export async function create(userId, data) {
     status: data.status || 'Active',
     logic_type: data.logic_type || 'Fixed',
     interval_months: data.interval_months || null,
+    billing_period_months: data.billing_period_months || null,
     is_evergreen: isEvergreen,
     next_date: isEvergreen ? null : normalizeDate(data.next_date),
     cancel_by_date: normalizeDate(data.cancel_by_date),

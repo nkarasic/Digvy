@@ -75,7 +75,7 @@ export async function getUpcomingCosts(userId, days = 90) {
 export async function getSubscriptionSummary(userId) {
   const { data: subs, error } = await supabase
     .from('items')
-    .select('id, name, status, next_date, interval_months, logs(price_paid, date)')
+    .select('id, name, status, next_date, interval_months, billing_period_months, logs(price_paid, date)')
     .eq('user_id', userId)
     .eq('category', 'Subscription');
 
@@ -84,16 +84,23 @@ export async function getSubscriptionSummary(userId) {
   const active = subs.filter(i => i.status === 'Active');
   const inactive = subs.filter(i => i.status === 'Inactive');
 
+  // Billing period drives the annual estimate. Fall back to the Interval
+  // cadence for subs migrated before billing_period_months existed; a sub with
+  // neither has an unknown cadence and is left out of the estimate rather than
+  // silently assumed to bill yearly.
+  const billingPeriod = item =>
+    item.billing_period_months || item.interval_months || null;
+
   let totalAnnualCost = 0;
   for (const item of active) {
     const prices = (item.logs || [])
       .filter(l => l.price_paid != null && Number(l.price_paid) > 0)
       .sort((a, b) => (a.date || '').localeCompare(b.date || ''))
       .map(l => Number(l.price_paid));
-    if (prices.length > 0) {
+    const period = billingPeriod(item);
+    if (prices.length > 0 && period) {
       const lastPrice = prices[prices.length - 1];
-      const interval = item.interval_months || 12;
-      totalAnnualCost += lastPrice * (12 / interval);
+      totalAnnualCost += lastPrice * (12 / period);
     }
   }
 
@@ -111,6 +118,7 @@ export async function getSubscriptionSummary(userId) {
         id: i.id,
         name: i.name,
         next_date: i.next_date,
+        billing_period_months: billingPeriod(i),
         last_price: prices.length > 0 ? prices[prices.length - 1] : null,
       };
     }),

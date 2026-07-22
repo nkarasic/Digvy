@@ -52,6 +52,21 @@ export const INTERVAL_PRESETS = [
   { label: '60 mo', value: 60 },
 ];
 
+export const BILLING_PERIOD_PRESETS = [
+  { label: 'Monthly', value: 1 },
+  { label: 'Quarterly', value: 3 },
+  { label: 'Semi-annual', value: 6 },
+  { label: 'Yearly', value: 12 },
+];
+
+// "Monthly" for 1, "Every N months" otherwise; null when no cadence is set.
+export function billingPeriodLabel(months) {
+  if (!months) return null;
+  const preset = BILLING_PERIOD_PRESETS.find(p => p.value === months);
+  if (preset) return preset.label;
+  return `Every ${months} months`;
+}
+
 export const SNOOZE_PRESETS = [
   { label: '1 week', days: 7 },
   { label: '2 weeks', days: 14 },
