@@ -36,7 +36,11 @@ export default function LoginPage({ initialMode = 'signin', embedded = false }) 
       if (mode === 'signup') {
         const { needsConfirmation } = await signup(email, password);
         if (needsConfirmation) {
-          setNotice(`Almost there — check ${email} for a confirmation link, then sign in.`);
+          // Neutral wording on purpose: Supabase returns the same "no session"
+          // response for a brand-new signup and for an email that already exists
+          // (anti-enumeration). Naming which case it is would leak account
+          // existence to any unauthenticated caller, so we don't.
+          setNotice(`If ${email} isn't already registered, a confirmation link is on its way. Already have an account? Sign in or reset your password below.`);
           setMode('signin');
         }
       } else if (mode === 'reset') {

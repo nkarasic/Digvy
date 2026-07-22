@@ -1,6 +1,6 @@
 # Tech Debt
 
-_Status: Living doc · Last updated: 2026-07-21 · Owner: Neal_
+_Status: Living doc · Last updated: 2026-07-22 · Owner: Neal_
 
 A running list of known, deliberately-deferred debt. Each item says what the
 gap is, why it matters, and a sketch of the fix, so a future session can pick it
@@ -60,3 +60,51 @@ reschedule) and `adminService` (wrong user suspended/deleted).
 
 `logService.addLog` and `adminService` first (highest blast radius), then route
 validation, then the remaining `statsService` DB functions.
+
+---
+
+## 2. Auth emails are unbranded and land in spam
+
+**Status:** Open · Logged 2026-07-22
+
+### The gap
+
+Supabase Auth's transactional emails (password reset, signup confirmation) use
+the default GoTrue templates — plain text, no branding, generic wording. The
+reset email tested on 2026-07-22 arrived from
+`Digvy App <noreply@notifications.digvy.com>`, **landed in spam**, and looks
+bare/spammy. These are the first emails a new user ever sees, so the current
+state hurts both deliverability and first impression.
+
+Note this is separate from the app's own digest email (`server/services/emailService.js`
++ `digestBuilder`), which is already HTML/branded. Auth email templates live in
+**Supabase's dashboard**, not in this repo.
+
+### Why it matters
+
+- **Deliverability:** bare, link-heavy, text-only mail from a freshly-used
+  sender domain is a classic spam signal. Users who don't check spam think
+  signup/reset is broken (this is exactly how the original "didn't receive the
+  email" report started).
+- **Trust/brand:** the confirmation and reset emails are the product's first
+  touchpoint; unbranded plain text reads as phishing.
+
+### The fix (sketch)
+
+1. **Customize the Supabase email templates** (Dashboard → Authentication →
+   Email Templates) for Confirm signup, Reset password, and Magic link — add
+   Digvy branding, a clear headline/CTA button, plain-english copy, and a
+   footer. Keep them HTML but lightweight.
+2. **Improve deliverability signals:** set a recognizable sender name, ensure
+   SPF/DKIM/DMARC are all green for `notifications.digvy.com` in Resend, keep a
+   plain-text alternative part, and avoid URL-shortener-style links. Consider a
+   DMARC policy and warming the sender.
+3. **Match the digest's visual style** so auth mail and digests feel like one
+   product. The digest HTML (`digestBuilder`) is a reasonable template to mirror.
+4. **Re-test** by triggering a reset + a fresh signup and confirming inbox
+   placement (not spam) across Gmail/Apple Mail.
+
+### Suggested priority
+
+Medium. Delivery now works, so this is polish + deliverability hardening rather
+than a hard blocker — but worth doing before any real user-acquisition push.
