@@ -2,14 +2,14 @@ import { useState, useEffect } from 'react';
 import { api } from '../api/client.js';
 import { useApp } from '../context/AppContext.jsx';
 
-export function useSpendByCategory() {
+export function useSpendByCategory(months) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const { refreshKey } = useApp();
 
   useEffect(() => {
-    api.getSpendByCategory().then(setData).catch(() => {}).finally(() => setLoading(false));
-  }, [refreshKey]);
+    api.getSpendByCategory(months).then(setData).catch(() => {}).finally(() => setLoading(false));
+  }, [refreshKey, months]);
 
   return { data, loading };
 }

@@ -1,28 +1,38 @@
 import supabase from '../db.js';
-import { daysUntil, daysSince } from '../utils/dateHelpers.js';
+import { daysUntil, daysSince, addMonths, toISODate } from '../utils/dateHelpers.js';
 
-export async function getSpendByCategory(userId) {
-  // Fetch items with logs
-  const { data: items, error } = await supabase
-    .from('items')
-    .select('category, logs(price_paid)')
-    .eq('user_id', userId);
-
-  if (error) throw new Error(error.message);
+// Pure aggregation, split out so it's testable without the database.
+// `months` defaults to 12 (annual); pass 0 (or a falsy value) for all-time.
+// A dated cutoff excludes older logs; undated logs can't be placed in time,
+// so they only count in the all-time view. `now` is injectable for tests.
+export function computeSpendByCategory(items, months = 12, now = new Date()) {
+  const cutoff = months > 0 ? toISODate(addMonths(now, -months)) : null;
 
   const spend = {};
-  for (const item of items) {
+  for (const item of items || []) {
     for (const log of item.logs || []) {
-      if (log.price_paid != null && log.price_paid > 0) {
-        const cat = item.category || 'Uncategorized';
-        spend[cat] = (spend[cat] || 0) + Number(log.price_paid);
-      }
+      if (log.price_paid == null || log.price_paid <= 0) continue;
+      // ISO date strings compare correctly with a lexicographic <.
+      if (cutoff && (!log.date || log.date < cutoff)) continue;
+      const cat = item.category || 'Uncategorized';
+      spend[cat] = (spend[cat] || 0) + Number(log.price_paid);
     }
   }
 
   return Object.entries(spend)
     .map(([category, total]) => ({ category, total: Math.round(total * 100) / 100 }))
     .sort((a, b) => b.total - a.total);
+}
+
+export async function getSpendByCategory(userId, months = 12) {
+  const { data: items, error } = await supabase
+    .from('items')
+    .select('category, logs(price_paid, date)')
+    .eq('user_id', userId);
+
+  if (error) throw new Error(error.message);
+
+  return computeSpendByCategory(items, months);
 }
 
 export async function getUpcomingCosts(userId, days = 90) {

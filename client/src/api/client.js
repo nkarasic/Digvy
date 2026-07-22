@@ -75,7 +75,7 @@ export const api = {
     request('/email/preferences', { method: 'PUT', body: JSON.stringify({ digest_enabled }) }),
 
   // Stats
-  getSpendByCategory: () => request('/stats/spend-by-category'),
+  getSpendByCategory: (months) => request(`/stats/spend-by-category${months != null ? `?months=${months}` : ''}`),
   getUpcomingCosts: (days) => request(`/stats/upcoming-costs${days ? `?days=${days}` : ''}`),
   getSubscriptions: () => request('/stats/subscriptions'),
   getIntervals: () => request('/stats/intervals'),

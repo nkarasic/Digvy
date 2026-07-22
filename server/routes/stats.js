@@ -5,7 +5,10 @@ const router = Router();
 
 router.get('/spend-by-category', async (req, res) => {
   try {
-    const data = await statsService.getSpendByCategory(req.userId);
+    // `months=all` (or 0) => lifetime; otherwise a trailing window, default 12.
+    const raw = req.query.months;
+    const months = raw === 'all' ? 0 : (raw != null ? parseInt(raw) || 0 : 12);
+    const data = await statsService.getSpendByCategory(req.userId, months);
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });

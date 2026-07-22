@@ -1,16 +1,37 @@
+import { useState } from 'react';
 import TopBar from '../layout/TopBar.jsx';
 import PageShell from '../layout/PageShell.jsx';
 import LoadingSpinner from '../common/LoadingSpinner.jsx';
 import { useSpendByCategory, useUpcomingCosts, useSubscriptions } from '../../hooks/useStats.js';
 import { formatDate } from '../../utils/dateFormat.js';
 
-function SpendByCategory({ data }) {
-  if (data.length === 0) return null;
+function SpendByCategory({ data, months, onMonthsChange }) {
   const max = data[0]?.total || 1;
 
   return (
     <div className="bg-white rounded-xl p-4 shadow-sm">
-      <h3 className="text-sm font-semibold text-slate-700 mb-3">Spend by Category</h3>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-slate-700">Spend by Category</h3>
+        <div className="flex rounded-lg bg-slate-100 p-0.5 text-xs">
+          {[
+            { label: 'Last 12 mo', value: 12 },
+            { label: 'All time', value: 'all' },
+          ].map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => onMonthsChange(opt.value)}
+              className={`px-2.5 py-1 rounded-md font-medium ${
+                months === opt.value ? 'bg-white text-slate-700 shadow-sm' : 'text-slate-400'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      {data.length === 0 ? (
+        <p className="text-sm text-slate-400 py-2">No spend logged in this period.</p>
+      ) : (
       <div className="space-y-2">
         {data.map(({ category, total }) => (
           <div key={category}>
@@ -27,6 +48,7 @@ function SpendByCategory({ data }) {
           </div>
         ))}
       </div>
+      )}
     </div>
   );
 }
@@ -93,10 +115,13 @@ function SubscriptionSummary({ data }) {
 }
 
 export default function StatsPage() {
-  const { data: spend, loading: l1 } = useSpendByCategory();
+  const [months, setMonths] = useState(12);
+  const { data: spend, loading: l1 } = useSpendByCategory(months);
   const { data: upcoming, loading: l2 } = useUpcomingCosts();
   const { data: subs, loading: l3 } = useSubscriptions();
-  const loading = l1 || l2 || l3;
+  // Only block the whole page on the first load; keep the spend card mounted
+  // (with its toggle) while switching windows so it doesn't flash the spinner.
+  const loading = (l1 && spend.length === 0) || l2 || l3;
 
   return (
     <PageShell>
@@ -105,10 +130,10 @@ export default function StatsPage() {
         <LoadingSpinner />
       ) : (
         <div className="px-4 py-4 space-y-4">
-          <SpendByCategory data={spend} />
+          <SpendByCategory data={spend} months={months} onMonthsChange={setMonths} />
           <UpcomingCosts data={upcoming} />
           <SubscriptionSummary data={subs} />
-          {spend.length === 0 && upcoming.length === 0 && !subs?.active_count && (
+          {upcoming.length === 0 && !subs?.active_count && (
             <p className="text-center text-sm text-slate-400 py-8">
               No stats available yet. Import items or log events with prices.
             </p>
