@@ -37,6 +37,14 @@ export const logCreateSchema = z.object({
   time: z.union([z.string().max(50), z.null()]).optional(),
   price_paid: optionalPrice,
   note: z.string().max(10_000).optional(),
+  // Optional "set up the next occurrence" payload, applied to the item in the
+  // same request. When set_next is true the item's schedule is overwritten with
+  // these values; otherwise Interval items still auto-advance (legacy behavior).
+  set_next: z.boolean().optional(),
+  next_date: optionalDate,
+  cancel_by_date: optionalDate,
+  is_evergreen: z.boolean().optional(),
+  date_type: z.enum(['firm', 'flexible']).optional(),
 });
 
 export const snoozeSchema = z.object({

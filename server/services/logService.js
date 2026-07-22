@@ -27,9 +27,17 @@ export async function addLog(userId, itemId, logData) {
   const { error: logErr } = await supabase.from('logs').insert(log);
   if (logErr) throw new Error(logErr.message);
 
-  // Auto-advance next_date for Interval items
+  // Logging clears any active snooze, then reschedules the item.
   const updates = { snoozed_until: null };
-  if (item.logic_type === 'Interval' && item.interval_months) {
+  if (logData.set_next) {
+    // Caller explicitly set up the next occurrence in the same action.
+    const evergreen = logData.is_evergreen === true;
+    updates.is_evergreen = evergreen;
+    updates.next_date = evergreen ? null : (logData.next_date || null);
+    updates.cancel_by_date = logData.cancel_by_date || null;
+    if (logData.date_type) updates.date_type = logData.date_type;
+  } else if (item.logic_type === 'Interval' && item.interval_months) {
+    // Legacy auto-advance for Interval items when no explicit schedule sent.
     updates.next_date = advanceByMonths(log.date, item.interval_months);
     updates.date_type = 'flexible';
     updates.is_evergreen = false;
