@@ -3,6 +3,7 @@ import supabase from '../db.js';
 import { requireAuth } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { emailPreferencesSchema } from '../schemas.js';
+import { appUrl } from '../utils/appUrl.js';
 
 const router = Router();
 
@@ -11,7 +12,7 @@ const page = (title, body) => `<!doctype html>
 <body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:480px;margin:80px auto;padding:0 16px;color:#111827;background:#fff;">
   <h2>${title}</h2>
   <p style="color:#6b7280;">${body}</p>
-  <p><a href="${process.env.APP_URL || 'https://digvy.vercel.app'}" style="color:#2563eb;">Back to Digvy</a></p>
+  <p><a href="${appUrl()}" style="color:#2563eb;">Back to Digvy</a></p>
 </body></html>`;
 
 const validToken = (token) =>
@@ -69,12 +70,11 @@ router.post('/unsubscribe', async (req, res) => {
       return res.status(404).send(page('Link expired', 'This unsubscribe link is no longer valid.'));
     }
 
-    const appUrl = process.env.APP_URL || 'https://digvy.vercel.app';
     res.send(page(
       'Unsubscribed',
       `You will no longer receive Digvy digest emails.
       Changed your mind? You can resubscribe any time from
-      <a href="${appUrl}/#/settings" style="color:#2563eb;">Settings in the app</a>.`
+      <a href="${appUrl()}/#/settings" style="color:#2563eb;">Settings in the app</a>.`
     ));
   } catch (err) {
     res.status(500).send(page('Something went wrong', 'Please try again later.'));

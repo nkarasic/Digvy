@@ -2,7 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!--
+      Icons. /favicon.ico must exist as a real file: Google's favicon crawler
+      requests it at the site root by path, and Vercel's SPA fallback would
+      otherwise answer with index.html — which reads as "no favicon" and gets
+      us the generic globe in search results. The SVG is listed first for
+      browsers that prefer it; the 48px PNG is the size Google indexes.
+    -->
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any" />
+    <link rel="icon" type="image/png" href="/favicon-48.png" sizes="48x48" />
+    <link rel="icon" type="image/png" href="/favicon-32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16.png" sizes="16x16" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -15,21 +29,29 @@
       name="description"
       content="Digvy tracks the infrequent life events that slip through the cracks — recurring maintenance, subscriptions, renewals, appointments, and free-trial cancel-by deadlines. It surfaces what needs action and keeps a searchable history of everything else."
     />
-    <link rel="canonical" href="https://digvy.vercel.app/" />
-    <meta name="robots" content="index, follow" />
+    <!--
+      Canonical host is www.digvy.com — the apex 308s to www on Vercel, and
+      digvy.vercel.app serves this same build. Pointing the canonical at the
+      custom domain consolidates all three into one indexed URL.
+    -->
+    <link rel="canonical" href="https://www.digvy.com/" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Digvy" />
-    <meta property="og:url" content="https://digvy.vercel.app/" />
+    <meta property="og:url" content="https://www.digvy.com/" />
     <meta property="og:title" content="Digvy — Get life’s admin off your mind" />
     <meta
       property="og:description"
       content="Track the things you deal with a few times a year — maintenance, subscriptions, renewals, appointments, and cancel-by deadlines. Digvy shows what needs action and keeps the rest searchable."
     />
-    <meta property="og:image" content="https://digvy.vercel.app/og-image.svg" />
+    <!-- PNG, not SVG: no social/search crawler renders SVG for a preview card. -->
+    <meta property="og:image" content="https://www.digvy.com/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Digvy — never miss a renewal, appointment, or cancel-by deadline." />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -38,7 +60,8 @@
       name="twitter:description"
       content="Track the things you deal with a few times a year — maintenance, subscriptions, renewals, appointments, and cancel-by deadlines. Digvy shows what needs action and keeps the rest searchable."
     />
-    <meta name="twitter:image" content="https://digvy.vercel.app/og-image.svg" />
+    <meta name="twitter:image" content="https://www.digvy.com/og-image.png" />
+    <meta name="twitter:image:alt" content="Digvy — never miss a renewal, appointment, or cancel-by deadline." />
 
     <!--
       Structured data for search engines and LLM / generative-answer crawlers (GEO).
@@ -49,11 +72,33 @@
       "@context": "https://schema.org",
       "@graph": [
         {
+          "@type": "Organization",
+          "@id": "https://www.digvy.com/#organization",
+          "name": "Digvy",
+          "url": "https://www.digvy.com/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://www.digvy.com/favicon-512.png",
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://www.digvy.com/#website",
+          "name": "Digvy",
+          "url": "https://www.digvy.com/",
+          "publisher": { "@id": "https://www.digvy.com/#organization" },
+          "description": "Digvy tracks the infrequent life events that slip through the cracks — recurring maintenance, subscriptions, renewals, appointments, and free-trial cancel-by deadlines."
+        },
+        {
           "@type": "SoftwareApplication",
           "name": "Digvy",
           "applicationCategory": "ProductivityApplication",
           "operatingSystem": "Web",
-          "url": "https://digvy.vercel.app/",
+          "url": "https://www.digvy.com/",
+          "image": "https://www.digvy.com/og-image.png",
+          "publisher": { "@id": "https://www.digvy.com/#organization" },
           "description": "Digvy is a web app for managing infrequent life events — recurring maintenance, subscriptions, appointments, renewals, cancel-by deadlines, and one-time reference records. Its dashboard surfaces what needs action (overdue, due soon, and cancel-by deadlines) and keeps a searchable history of everything else.",
           "offers": {
             "@type": "Offer",

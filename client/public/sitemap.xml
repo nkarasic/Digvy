@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Digvy is a HashRouter SPA, so "/" is the only URL a crawler can fetch as a
+  distinct document — everything else lives behind "#/" fragments, which are
+  never sent to the server. Add entries here only if real server-rendered
+  paths are introduced.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://www.digvy.com/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>

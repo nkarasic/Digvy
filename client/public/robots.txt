@@ -1,0 +1,11 @@
+# Digvy — https://www.digvy.com
+#
+# Without this file Vercel's SPA fallback answers /robots.txt with index.html,
+# which crawlers read as a malformed (but permissive) robots file. Serving a
+# real one also gives us somewhere to advertise the sitemap.
+
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://www.digvy.com/sitemap.xml

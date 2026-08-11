@@ -101,8 +101,8 @@ test('renderDigestEmail includes counts, items, and unsubscribe link', () => {
     item({ name: 'Gym trial', next_date: iso(90), cancel_by_date: iso(4) }),
   ]);
   const { subject, html, text } = renderDigestEmail(digest, {
-    appUrl: 'https://digvy.vercel.app',
-    unsubscribeUrl: 'https://digvy.vercel.app/api/email/unsubscribe?token=tok123',
+    appUrl: 'https://www.digvy.com',
+    unsubscribeUrl: 'https://www.digvy.com/api/email/unsubscribe?token=tok123',
   });
 
   assert.equal(subject, 'Digvy: 1 overdue, 1 due this week');

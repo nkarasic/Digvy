@@ -2,10 +2,9 @@ import supabase from '../db.js';
 import { nanoid } from 'nanoid';
 import { buildDigest, renderDigestEmail } from './digestBuilder.js';
 import { sendEmail } from './emailService.js';
+import { appUrl as APP_URL } from '../utils/appUrl.js';
 
 export { buildDigest, renderDigestEmail };
-
-const APP_URL = () => process.env.APP_URL || 'https://digvy.vercel.app';
 
 async function getPrefs(userId, { createIfMissing }) {
   const { data, error } = await supabase

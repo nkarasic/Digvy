@@ -2,7 +2,7 @@
 
 A web app for managing infrequent life events — recurring maintenance, subscriptions, appointments, renewals, and one-time reference records. The dashboard surfaces what needs action (overdue, due soon, cancel-by deadlines) and keeps a searchable history of everything else.
 
-**Live:** https://digvy.vercel.app
+**Live:** https://www.digvy.com
 
 ## Stack
 
@@ -50,7 +50,7 @@ A daily Vercel Cron job (`vercel.json` → `GET /api/digest/run`, 13:00 UTC) ema
 
 Preferences: users without an `email_preferences` row are subscribed by default; the digest job creates the row (with an unsubscribe token) on first send. Every email carries a one-click unsubscribe link (`GET /api/email/unsubscribe?token=…`), and the authed `GET`/`PUT /api/email/preferences` endpoints exist for an in-app toggle.
 
-Environment variables: `RESEND_API_KEY` (required to send), `CRON_SECRET` (required), `EMAIL_FROM` (optional; defaults to Resend's onboarding sender, which only delivers to the account owner until a domain is verified), `APP_URL` (optional; defaults to https://digvy.vercel.app, used for links in the email).
+Environment variables: `RESEND_API_KEY` (required to send), `CRON_SECRET` (required), `EMAIL_FROM` (optional; defaults to Resend's onboarding sender, which only delivers to the account owner until a domain is verified), `APP_URL` (optional; defaults to https://www.digvy.com, used for links in the email).
 
 Local triggers:
 

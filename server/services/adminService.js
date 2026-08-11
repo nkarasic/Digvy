@@ -1,6 +1,7 @@
 import supabase from '../db.js';
 import { getAll as getItemsForUser } from './itemService.js';
 import { runDigestForUser } from './digestService.js';
+import { appUrl } from '../utils/appUrl.js';
 
 // Operator role for a user, or null if they have no console access.
 export async function getRole(userId) {
@@ -252,8 +253,7 @@ export async function sendPasswordReset({ actorId, userId }) {
   const detail = await getUserDetail(userId);
   if (!detail) return null;
 
-  const redirectTo = process.env.APP_URL || 'https://digvy.vercel.app';
-  const { error } = await supabase.auth.resetPasswordForEmail(detail.email, { redirectTo });
+  const { error } = await supabase.auth.resetPasswordForEmail(detail.email, { redirectTo: appUrl() });
   if (error) throw new Error(error.message);
 
   await logAudit({
