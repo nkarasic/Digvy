@@ -23,6 +23,7 @@
     "express-rate-limit": "^8.6.0",
     "fuse.js": "^7.1.0",
     "helmet": "^8.3.0",
+    "jose": "^6.2.12",
     "multer": "^2.1.1",
     "nanoid": "^5.1.5",
     "zod": "^4.4.3"
