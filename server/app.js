@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { requireAuth } from './middleware/auth.js';
+import { requireAuth, requireAuthRemote } from './middleware/auth.js';
 import { requireAdmin } from './middleware/requireAdmin.js';
 import itemRoutes from './routes/items.js';
 import logRoutes from './routes/logs.js';
@@ -44,9 +44,13 @@ app.use('/api/search', requireAuth, searchRoutes);
 app.use('/api/import', requireAuth, importRoutes);
 app.use('/api/stats', requireAuth, statsRoutes);
 
-// Operator console. requireAuth verifies the JWT; requireAdmin() enforces at
-// least the 'support' role. Destructive routes inside re-gate for 'admin'.
-app.use('/api/admin', requireAuth, requireAdmin(), adminRoutes);
+// Operator console. requireAuthRemote verifies the JWT against the Auth API
+// rather than locally, so revoking an operator takes effect immediately on the
+// one surface that can read and delete every user's data; requireAdmin()
+// enforces at least the 'support' role. Destructive routes inside re-gate for
+// 'admin'. The extra round trip is affordable here because the console is
+// low-traffic — everything else uses the local check.
+app.use('/api/admin', requireAuthRemote, requireAdmin(), adminRoutes);
 
 // These manage their own auth: CRON_SECRET for the digest trigger,
 // unsubscribe token or per-route JWT for email preferences
